@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790429434025,
+      "tag": "0000_schema_noleggio",
+      "breakpoints": true
+    }
+  ]
 }

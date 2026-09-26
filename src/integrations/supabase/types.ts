@@ -14,16 +14,292 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      employees: {
+        Row: {
+          attivo: boolean
+          cognome: string
+          id: string
+          nome: string
+          ruolo: Database["public"]["Enums"]["employee_ruolo"]
+          telefono: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attivo?: boolean
+          cognome: string
+          id?: string
+          nome: string
+          ruolo: Database["public"]["Enums"]["employee_ruolo"]
+          telefono?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attivo?: boolean
+          cognome?: string
+          id?: string
+          nome?: string
+          ruolo?: Database["public"]["Enums"]["employee_ruolo"]
+          telefono?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      equipment: {
+        Row: {
+          category_id: string
+          created_at: string
+          foto_url: string | null
+          id: string
+          marca: string | null
+          modello: string | null
+          nome: string
+          note: string | null
+          numero_seriale: string | null
+          pos_x: number
+          pos_y: number
+          pos_z: number
+          prezzo_giornaliero: number
+          stato: Database["public"]["Enums"]["equipment_stato"]
+          zona_magazzino: string | null
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          marca?: string | null
+          modello?: string | null
+          nome: string
+          note?: string | null
+          numero_seriale?: string | null
+          pos_x?: number
+          pos_y?: number
+          pos_z?: number
+          prezzo_giornaliero?: number
+          stato?: Database["public"]["Enums"]["equipment_stato"]
+          zona_magazzino?: string | null
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          marca?: string | null
+          modello?: string | null
+          nome?: string
+          note?: string | null
+          numero_seriale?: string | null
+          pos_x?: number
+          pos_y?: number
+          pos_z?: number
+          prezzo_giornaliero?: number
+          stato?: Database["public"]["Enums"]["equipment_stato"]
+          zona_magazzino?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipment_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "equipment_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipment_categories: {
+        Row: {
+          colore: string | null
+          icona: string | null
+          id: string
+          nome: string
+          zona: string
+        }
+        Insert: {
+          colore?: string | null
+          icona?: string | null
+          id?: string
+          nome: string
+          zona: string
+        }
+        Update: {
+          colore?: string | null
+          icona?: string | null
+          id?: string
+          nome?: string
+          zona?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          equipment_id: string
+          id: string
+          order_id: string
+        }
+        Insert: {
+          equipment_id: string
+          id?: string
+          order_id: string
+        }
+        Update: {
+          equipment_id?: string
+          id?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          cliente_email: string | null
+          cliente_nome: string
+          cliente_telefono: string | null
+          created_at: string
+          data_fine: string
+          data_inizio: string
+          id: string
+          luogo_evento: string | null
+          note: string | null
+          stato: Database["public"]["Enums"]["order_stato"]
+        }
+        Insert: {
+          cliente_email?: string | null
+          cliente_nome: string
+          cliente_telefono?: string | null
+          created_at?: string
+          data_fine: string
+          data_inizio: string
+          id?: string
+          luogo_evento?: string | null
+          note?: string | null
+          stato?: Database["public"]["Enums"]["order_stato"]
+        }
+        Update: {
+          cliente_email?: string | null
+          cliente_nome?: string
+          cliente_telefono?: string | null
+          created_at?: string
+          data_fine?: string
+          data_inizio?: string
+          id?: string
+          luogo_evento?: string | null
+          note?: string | null
+          stato?: Database["public"]["Enums"]["order_stato"]
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          data_ora: string
+          employee_id: string | null
+          id: string
+          note: string | null
+          order_id: string
+          stato: Database["public"]["Enums"]["task_stato"]
+          tipo: Database["public"]["Enums"]["task_tipo"]
+        }
+        Insert: {
+          data_ora: string
+          employee_id?: string | null
+          id?: string
+          note?: string | null
+          order_id: string
+          stato?: Database["public"]["Enums"]["task_stato"]
+          tipo: Database["public"]["Enums"]["task_tipo"]
+        }
+        Update: {
+          data_ora?: string
+          employee_id?: string | null
+          id?: string
+          note?: string | null
+          order_id?: string
+          stato?: Database["public"]["Enums"]["task_stato"]
+          tipo?: Database["public"]["Enums"]["task_tipo"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "dipendente"
+      employee_ruolo:
+        | "magazziniere"
+        | "tecnico_audio"
+        | "tecnico_luci"
+        | "autista"
+      equipment_stato: "disponibile" | "in_manutenzione" | "fuori_servizio"
+      order_stato:
+        | "bozza"
+        | "confermato"
+        | "in_corso"
+        | "completato"
+        | "annullato"
+      task_stato: "da_fare" | "in_corso" | "completato"
+      task_tipo:
+        | "preparazione"
+        | "carico"
+        | "consegna"
+        | "montaggio"
+        | "smontaggio"
+        | "rientro_controllo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +426,31 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "dipendente"],
+      employee_ruolo: [
+        "magazziniere",
+        "tecnico_audio",
+        "tecnico_luci",
+        "autista",
+      ],
+      equipment_stato: ["disponibile", "in_manutenzione", "fuori_servizio"],
+      order_stato: [
+        "bozza",
+        "confermato",
+        "in_corso",
+        "completato",
+        "annullato",
+      ],
+      task_stato: ["da_fare", "in_corso", "completato"],
+      task_tipo: [
+        "preparazione",
+        "carico",
+        "consegna",
+        "montaggio",
+        "smontaggio",
+        "rientro_controllo",
+      ],
+    },
   },
 } as const
