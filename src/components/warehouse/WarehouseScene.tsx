@@ -70,7 +70,7 @@ const SHELF_H = 0.08;
 function PartMesh({
   items, part, hoveredId, selectedId, onHover, onSelect,
 }: {
-  items: SceneItem[]; part: Part; hoveredId?: string; selectedId?: string;
+  items: SceneItem[]; part: Part; hoveredId?: string | undefined; selectedId?: string | undefined;
   onHover: (i: SceneItem | null, p?: THREE.Vector3) => void; onSelect: (i: SceneItem) => void;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
@@ -222,7 +222,7 @@ function CameraRig({ focus, controls }: { focus: THREE.Vector3 | null; controls:
 export default function WarehouseScene({
   items, selectedId, onSelect, focus, onUserMove,
 }: {
-  items: SceneItem[]; selectedId?: string; onSelect: (i: SceneItem) => void;
+  items: SceneItem[]; selectedId?: string | undefined; onSelect: (i: SceneItem) => void;
   focus: THREE.Vector3 | null; onUserMove: () => void;
 }) {
   const [hover, setHover] = useState<{ it: SceneItem; p: THREE.Vector3 } | null>(null);

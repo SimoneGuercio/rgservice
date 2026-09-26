@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/magazzino")({
   component: Magazzino,
 });
 
-type Row = SceneItem & { conflict?: Order };
+type Row = SceneItem & { conflict?: Order | undefined };
 
 function StatusBadge({ s }: { s: LiveStatus }) {
   return <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${STATUS_CLASS[s]}`}>{STATUS_LABEL[s]}</span>;
@@ -97,7 +97,7 @@ function Magazzino() {
       );
       return;
     }
-    if (cart.some((c) => c.e.id === r.e.id)) return toast.info("Già nell'ordine");
+    if (cart.some((c) => c.e.id === r.e.id)) { toast.info("Già nell'ordine"); return; }
     setCart((c) => [...c, r]);
     toast.success(`${r.e.nome} aggiunto all'ordine`);
   }
@@ -336,20 +336,21 @@ function CreateOrderDialog({
   const total = cart.reduce((s, r) => s + Number(r.e.prezzo_giornaliero), 0) * days;
 
   async function save() {
-    if (!f.cliente_nome.trim()) return toast.error("Inserisci il nome del cliente");
-    if (conflicts.length) return toast.error("Rimuovi l'attrezzatura in conflitto prima di salvare");
+    if (!f.cliente_nome.trim()) { toast.error("Inserisci il nome del cliente"); return; }
+    if (conflicts.length) { toast.error("Rimuovi l'attrezzatura in conflitto prima di salvare"); return; }
     setBusy(true);
     const { data: order, error } = await supabase
       .from("orders")
       .insert({ ...f, data_inizio: from, data_fine: to, stato: "confermato" })
       .select()
       .single();
-    if (error || !order) { setBusy(false); return toast.error(error?.message ?? "Errore"); }
+    if (error || !order) { setBusy(false); toast.error(error?.message ?? "Errore"); return; }
     const { error: e2 } = await supabase.from("order_items").insert(cart.map((r) => ({ order_id: order.id, equipment_id: r.e.id })));
     if (e2) {
       await supabase.from("orders").delete().eq("id", order.id);
       setBusy(false);
-      return toast.error(e2.message);
+      toast.error(e2.message);
+      return;
     }
     setBusy(false);
     toast.success(`Ordine per ${f.cliente_nome} creato`);
