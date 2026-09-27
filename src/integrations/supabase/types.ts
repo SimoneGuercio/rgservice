@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           attivo: boolean
           cognome: string
+          email: string | null
           id: string
           nome: string
           ruolo: Database["public"]["Enums"]["employee_ruolo"]
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           attivo?: boolean
           cognome: string
+          email?: string | null
           id?: string
           nome: string
           ruolo: Database["public"]["Enums"]["employee_ruolo"]
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           attivo?: boolean
           cognome?: string
+          email?: string | null
           id?: string
           nome?: string
           ruolo?: Database["public"]["Enums"]["employee_ruolo"]
@@ -130,6 +133,94 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          letta: boolean
+          link: string | null
+          messaggio: string | null
+          titolo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          letta?: boolean
+          link?: string | null
+          messaggio?: string | null
+          titolo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          letta?: boolean
+          link?: string | null
+          messaggio?: string | null
+          titolo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      order_assignments: {
+        Row: {
+          compenso: number
+          created_at: string
+          employee_id: string
+          id: string
+          motivo_rifiuto: string | null
+          order_id: string
+          responded_at: string | null
+          stato: Database["public"]["Enums"]["assignment_stato"]
+          van_id: string | null
+        }
+        Insert: {
+          compenso?: number
+          created_at?: string
+          employee_id: string
+          id?: string
+          motivo_rifiuto?: string | null
+          order_id: string
+          responded_at?: string | null
+          stato?: Database["public"]["Enums"]["assignment_stato"]
+          van_id?: string | null
+        }
+        Update: {
+          compenso?: number
+          created_at?: string
+          employee_id?: string
+          id?: string
+          motivo_rifiuto?: string | null
+          order_id?: string
+          responded_at?: string | null
+          stato?: Database["public"]["Enums"]["assignment_stato"]
+          van_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_assignments_van_id_fkey"
+            columns: ["van_id"]
+            isOneToOne: false
+            referencedRelation: "vans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           equipment_id: string
@@ -171,9 +262,11 @@ export type Database = {
           created_at: string
           data_fine: string
           data_inizio: string
+          descrizione_evento: string | null
           id: string
           luogo_evento: string | null
           note: string | null
+          persone_richieste: number
           stato: Database["public"]["Enums"]["order_stato"]
         }
         Insert: {
@@ -183,9 +276,11 @@ export type Database = {
           created_at?: string
           data_fine: string
           data_inizio: string
+          descrizione_evento?: string | null
           id?: string
           luogo_evento?: string | null
           note?: string | null
+          persone_richieste?: number
           stato?: Database["public"]["Enums"]["order_stato"]
         }
         Update: {
@@ -195,9 +290,11 @@ export type Database = {
           created_at?: string
           data_fine?: string
           data_inizio?: string
+          descrizione_evento?: string | null
           id?: string
           luogo_evento?: string | null
           note?: string | null
+          persone_richieste?: number
           stato?: Database["public"]["Enums"]["order_stato"]
         }
         Relationships: []
@@ -265,6 +362,27 @@ export type Database = {
         }
         Relationships: []
       }
+      vans: {
+        Row: {
+          attivo: boolean
+          id: string
+          nome: string
+          targa: string | null
+        }
+        Insert: {
+          attivo?: boolean
+          id?: string
+          nome: string
+          targa?: string | null
+        }
+        Update: {
+          attivo?: boolean
+          id?: string
+          nome?: string
+          targa?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -277,9 +395,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      respond_assignment: {
+        Args: { _accetta: boolean; _id: string; _motivo?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "dipendente"
+      assignment_stato: "in_attesa" | "accettato" | "rifiutato"
       employee_ruolo:
         | "magazziniere"
         | "tecnico_audio"
@@ -428,6 +551,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "dipendente"],
+      assignment_stato: ["in_attesa", "accettato", "rifiutato"],
       employee_ruolo: [
         "magazziniere",
         "tecnico_audio",

@@ -8,6 +8,13 @@
       "when": 1790429434025,
       "tag": "0000_schema_noleggio",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790501666396,
+      "tag": "0001_assignments_vans_notifications",
+      "breakpoints": true
     }
   ]
 }
