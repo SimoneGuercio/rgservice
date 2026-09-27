@@ -42,8 +42,8 @@ function MieiLavori() {
   });
 
   async function respond(id: string, accetta: boolean) {
-    const { error } = await supabase.rpc("respond_assignment", { _id: id, _accetta: accetta, _motivo: accetta ? undefined : motivo.trim().slice(0, 300) || undefined });
-    if (error) return toast.error(error.message);
+    const { error } = await supabase.rpc("respond_assignment", accetta || !motivo.trim() ? { _id: id, _accetta: accetta } : { _id: id, _accetta: accetta, _motivo: motivo.trim().slice(0, 300) });
+    if (error) { toast.error(error.message); return; }
     toast.success(accetta ? "Lavoro accettato" : "Lavoro rifiutato");
     setRejecting(null); setMotivo("");
     qc.invalidateQueries({ queryKey: ["my-assignments"] });

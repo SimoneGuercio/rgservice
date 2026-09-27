@@ -96,7 +96,7 @@ function EmployeeForm({ existing, onDone }: { existing: Tables<"employees"> | nu
 
   async function submit(ev: React.FormEvent) {
     ev.preventDefault();
-    if (f.password.length < 8) return toast.error("La password deve avere almeno 8 caratteri");
+    if (f.password.length < 8) { toast.error("La password deve avere almeno 8 caratteri"); return; }
     setBusy(true);
     try {
       await create({ data: { ...f, employeeId: existing?.id } });

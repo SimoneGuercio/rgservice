@@ -133,13 +133,13 @@ function OrderDetail({ order, data, isAdmin }: { order: Data["orders"][number]; 
   async function saveInfo() {
     const n = Math.max(1, Math.min(10, parseInt(persone) || 1));
     const { error } = await supabase.from("orders").update({ descrizione_evento: descr.trim() || null, persone_richieste: n }).eq("id", order.id);
-    if (error) return toast.error("Salvataggio non riuscito");
+    if (error) { toast.error("Salvataggio non riuscito"); return; }
     toast.success("Ordine aggiornato");
     refresh();
   }
 
   async function assign() {
-    if (!emp) return toast.error("Scegli un dipendente");
+    if (!emp) { toast.error("Scegli un dipendente"); return; }
     const e = empById.get(emp);
     if (!e?.user_id) toast.warning("Questo dipendente non ha un accesso: non riceverà la notifica.");
     setBusy(true);
@@ -147,7 +147,7 @@ function OrderDetail({ order, data, isAdmin }: { order: Data["orders"][number]; 
       order_id: order.id, employee_id: emp, van_id: van || null, compenso: Number(compenso) || 0,
     });
     setBusy(false);
-    if (error) return toast.error(error.message.includes("duplicate") ? "Dipendente già assegnato" : "Assegnazione non riuscita");
+    if (error) { toast.error(error.message.includes("duplicate") ? "Dipendente già assegnato" : "Assegnazione non riuscita"); return; }
     toast.success("Assegnazione inviata");
     setEmp(""); setVan(""); setCompenso("");
     refresh();
@@ -155,7 +155,7 @@ function OrderDetail({ order, data, isAdmin }: { order: Data["orders"][number]; 
 
   async function remove(id: string) {
     const { error } = await supabase.from("order_assignments").delete().eq("id", id);
-    if (error) return toast.error("Eliminazione non riuscita");
+    if (error) { toast.error("Eliminazione non riuscita"); return; }
     refresh();
   }
 

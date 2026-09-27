@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/use-role";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -19,14 +20,15 @@ export const Route = createFileRoute("/_authenticated")({
 const soon = [
   { icon: LayoutDashboard, label: "Dashboard" },
   { icon: Package, label: "Inventario" },
-  { icon: ClipboardList, label: "Ordini" },
   { icon: CalendarDays, label: "Calendario" },
-  { icon: KanbanSquare, label: "Lavori" },
-  { icon: Users, label: "Dipendenti" },
 ];
+
+const linkCls = "flex items-center gap-3 rounded-md px-3 py-2 text-sm text-sidebar-foreground hover:bg-sidebar-accent";
+const activeCls = { className: "bg-sidebar-accent text-primary" };
 
 function Shell() {
   const { isAdmin, email } = useRole();
+  const { user } = Route.useRouteContext();
   const qc = useQueryClient();
   const nav = useNavigate();
 
@@ -52,6 +54,14 @@ function Shell() {
           >
             <Box className="h-4 w-4" /> Magazzino 3D
           </Link>
+          {isAdmin && (
+            <>
+              <Link to="/ordini" className={linkCls} activeProps={activeCls}><ClipboardList className="h-4 w-4" /> Ordini</Link>
+              <Link to="/dipendenti" className={linkCls} activeProps={activeCls}><Users className="h-4 w-4" /> Dipendenti</Link>
+            </>
+          )}
+          <Link to="/miei-lavori" className={linkCls} activeProps={activeCls}><KanbanSquare className="h-4 w-4" /> I miei lavori</Link>
+          <NotificationBell userId={user.id} />
           {soon.map((s) => (
             <div key={s.label} className="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground/60">
               <s.icon className="h-4 w-4" /> {s.label}
