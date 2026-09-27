@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedDipendentiRouteImport } from './routes/_authenticated/dipendenti'
 import { Route as AuthenticatedMagazzinoRouteImport } from './routes/_authenticated/magazzino'
+import { Route as AuthenticatedMieiLavoriRouteImport } from './routes/_authenticated/miei-lavori'
+import { Route as AuthenticatedOrdiniRouteImport } from './routes/_authenticated/ordini'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,36 +31,68 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDipendentiRoute = AuthenticatedDipendentiRouteImport.update({
+  id: '/dipendenti',
+  path: '/dipendenti',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMagazzinoRoute = AuthenticatedMagazzinoRouteImport.update({
   id: '/magazzino',
   path: '/magazzino',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMieiLavoriRoute = AuthenticatedMieiLavoriRouteImport.update({
+  id: '/miei-lavori',
+  path: '/miei-lavori',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrdiniRoute = AuthenticatedOrdiniRouteImport.update({
+  id: '/ordini',
+  path: '/ordini',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dipendenti': typeof AuthenticatedDipendentiRoute
   '/magazzino': typeof AuthenticatedMagazzinoRoute
+  '/miei-lavori': typeof AuthenticatedMieiLavoriRoute
+  '/ordini': typeof AuthenticatedOrdiniRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/dipendenti': typeof AuthenticatedDipendentiRoute
   '/magazzino': typeof AuthenticatedMagazzinoRoute
+  '/miei-lavori': typeof AuthenticatedMieiLavoriRoute
+  '/ordini': typeof AuthenticatedOrdiniRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/dipendenti': typeof AuthenticatedDipendentiRoute
   '/_authenticated/magazzino': typeof AuthenticatedMagazzinoRoute
+  '/_authenticated/miei-lavori': typeof AuthenticatedMieiLavoriRoute
+  '/_authenticated/ordini': typeof AuthenticatedOrdiniRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/magazzino'
+  fullPaths:
+    '/' | '/auth' | '/dipendenti' | '/magazzino' | '/miei-lavori' | '/ordini'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/magazzino'
+  to: '/' | '/auth' | '/dipendenti' | '/magazzino' | '/miei-lavori' | '/ordini'
   id:
-    '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/magazzino'
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/dipendenti'
+    | '/_authenticated/magazzino'
+    | '/_authenticated/miei-lavori'
+    | '/_authenticated/ordini'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +124,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dipendenti': {
+      id: '/_authenticated/dipendenti'
+      path: '/dipendenti'
+      fullPath: '/dipendenti'
+      preLoaderRoute: typeof AuthenticatedDipendentiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/magazzino': {
       id: '/_authenticated/magazzino'
       path: '/magazzino'
@@ -96,15 +138,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMagazzinoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/miei-lavori': {
+      id: '/_authenticated/miei-lavori'
+      path: '/miei-lavori'
+      fullPath: '/miei-lavori'
+      preLoaderRoute: typeof AuthenticatedMieiLavoriRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ordini': {
+      id: '/_authenticated/ordini'
+      path: '/ordini'
+      fullPath: '/ordini'
+      preLoaderRoute: typeof AuthenticatedOrdiniRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDipendentiRoute: typeof AuthenticatedDipendentiRoute
   AuthenticatedMagazzinoRoute: typeof AuthenticatedMagazzinoRoute
+  AuthenticatedMieiLavoriRoute: typeof AuthenticatedMieiLavoriRoute
+  AuthenticatedOrdiniRoute: typeof AuthenticatedOrdiniRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDipendentiRoute: AuthenticatedDipendentiRoute,
   AuthenticatedMagazzinoRoute: AuthenticatedMagazzinoRoute,
+  AuthenticatedMieiLavoriRoute: AuthenticatedMieiLavoriRoute,
+  AuthenticatedOrdiniRoute: AuthenticatedOrdiniRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
