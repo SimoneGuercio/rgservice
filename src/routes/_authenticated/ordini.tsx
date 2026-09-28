@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MapPin, CalendarDays, Truck, Users, Trash2, Plus } from "lucide-react";
+import { MapPin, CalendarDays, Truck, Users, Trash2, Plus, Package, StickyNote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/use-role";
 import { Button } from "@/components/ui/button";
@@ -30,15 +30,16 @@ function useOrdiniData() {
   return useQuery({
     queryKey: ["ordini-full"],
     queryFn: async () => {
-      const [o, a, e, v] = await Promise.all([
+      const [o, a, e, v, i] = await Promise.all([
         supabase.from("orders").select("*").order("data_inizio"),
         supabase.from("order_assignments").select("*"),
         supabase.from("employees").select("*").order("nome"),
         supabase.from("vans").select("*").eq("attivo", true).order("nome"),
+        supabase.from("order_items").select("order_id, equipment(nome, marca, modello, equipment_categories(nome))"),
       ]);
-      const err = o.error || a.error || e.error || v.error;
+      const err = o.error || a.error || e.error || v.error || i.error;
       if (err) throw err;
-      return { orders: o.data!, assignments: a.data!, employees: e.data!, vans: v.data! };
+      return { orders: o.data ?? [], assignments: a.data ?? [], employees: e.data ?? [], vans: v.data ?? [], items: i.data ?? [] };
     },
   });
 }
@@ -119,6 +120,7 @@ function OrderDetail({ order, data, isAdmin }: { order: Data["orders"][number]; 
   const assignedIds = new Set(asg.map((a) => a.employee_id));
   const empById = new Map(data.employees.map((e) => [e.id, e]));
   const vanById = new Map(data.vans.map((v) => [v.id, v]));
+  const material = data.items.filter((item) => item.order_id === order.id);
 
   // Vans busy on other overlapping orders (not refused)
   const busyVans = useMemo(() => {
@@ -167,6 +169,27 @@ function OrderDetail({ order, data, isAdmin }: { order: Data["orders"][number]; 
           <p className="flex items-center gap-2"><MapPin className="h-4 w-4" />{order.luogo_evento || "Luogo da definire"}</p>
           <p className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{fmtDate(order.data_inizio)} → {fmtDate(order.data_fine)}</p>
           {order.cliente_telefono && <p>Tel. {order.cliente_telefono}</p>}
+        </div>
+
+        {order.note && (
+          <div>
+            <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground"><StickyNote className="h-3.5 w-3.5" />Note ordine</p>
+            <p className="whitespace-pre-line rounded-md border bg-muted/20 p-3">{order.note}</p>
+          </div>
+        )}
+
+        <div>
+          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground"><Package className="h-3.5 w-3.5" />Materiale · {material.length}</p>
+          {material.length === 0 ? <p className="text-muted-foreground">Nessun materiale associato.</p> : (
+            <ul className="divide-y rounded-md border bg-muted/20 px-3">
+              {material.map((item, index) => (
+                <li key={`${item.equipment?.nome ?? "item"}-${index}`} className="flex items-start justify-between gap-3 py-2">
+                  <span className="font-medium">{item.equipment?.nome ?? "Attrezzatura"}</span>
+                  <span className="text-right text-xs text-muted-foreground">{[item.equipment?.marca, item.equipment?.modello].filter(Boolean).join(" ")}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="space-y-2">

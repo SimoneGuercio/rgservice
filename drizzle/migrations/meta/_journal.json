@@ -15,6 +15,13 @@
       "when": 1790501666396,
       "tag": "0001_assignments_vans_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790600950997,
+      "tag": "0002_enrich_assignment_notifications",
+      "breakpoints": true
     }
   ]
 }
