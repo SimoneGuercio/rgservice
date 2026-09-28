@@ -330,7 +330,7 @@ function CreateOrderDialog({
   open: boolean; onOpenChange: (o: boolean) => void; cart: Row[]; conflicts: string[];
   onRemove: (id: string) => void; from: string; to: string; onDone: () => void;
 }) {
-  const [f, setF] = useState({ cliente_nome: "", cliente_telefono: "", cliente_email: "", luogo_evento: "", note: "" });
+  const [f, setF] = useState({ cliente_nome: "", cliente_telefono: "", cliente_email: "", luogo_evento: "", descrizione_evento: "", note: "" });
   const [busy, setBusy] = useState(false);
   const days = Math.max(1, Math.round((+new Date(to) - +new Date(from)) / 86400000) + 1);
   const total = cart.reduce((s, r) => s + Number(r.e.prezzo_giornaliero), 0) * days;
@@ -354,7 +354,7 @@ function CreateOrderDialog({
     }
     setBusy(false);
     toast.success(`Ordine per ${f.cliente_nome} creato`);
-    setF({ cliente_nome: "", cliente_telefono: "", cliente_email: "", luogo_evento: "", note: "" });
+    setF({ cliente_nome: "", cliente_telefono: "", cliente_email: "", luogo_evento: "", descrizione_evento: "", note: "" });
     onDone();
   }
 
@@ -374,6 +374,24 @@ function CreateOrderDialog({
           {field("luogo_evento", "Luogo evento")}
           {field("cliente_telefono", "Telefono")}
           {field("cliente_email", "Email", "email")}
+        </div>
+        <div className="space-y-1">
+          <Label>Descrizione completa dell’evento</Label>
+          <textarea
+            value={f.descrizione_evento}
+            onChange={(e) => setF({ ...f, descrizione_evento: e.target.value })}
+            className="min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            placeholder="Tipo di evento, orari, montaggio, richieste tecniche…"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label>Note operative</Label>
+          <textarea
+            value={f.note}
+            onChange={(e) => setF({ ...f, note: e.target.value })}
+            className="min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            placeholder="Accessi, referente sul posto, indicazioni per la squadra…"
+          />
         </div>
         <div className="max-h-48 space-y-1 overflow-auto rounded-md border p-2">
           {cart.map((r) => (

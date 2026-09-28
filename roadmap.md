@@ -5,7 +5,9 @@
 - [x] 3D warehouse with date filter, categories, search, list view, detail panel, quick order creation
 - [ ] Dashboard
 - [ ] Inventario (CRUD)
-- [ ] Ordini (list + edit)
+- [x] Ordini (lista, dettaglio, squadra, furgone, compenso e materiale)
 - [ ] Calendario
 - [ ] Lavori (Kanban)
-- [ ] Dipendenti
+- [x] Dipendenti e profili di accesso
+- [x] Incarichi dipendente con descrizione completa, note e materiale
+- [x] Modelli 3D semirealistici ottimizzati per categoria

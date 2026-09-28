@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MapPin, CalendarDays, Truck, Check, X } from "lucide-react";
+import { MapPin, CalendarDays, Truck, Check, X, Package, FileText, StickyNote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,13 +31,24 @@ function MieiLavori() {
       const { data: u } = await supabase.auth.getUser();
       const { data: emp } = await supabase.from("employees").select("id").eq("user_id", u.user!.id).maybeSingle();
       if (!emp) return null;
-      const { data, error } = await supabase
+      const { data: assignments, error } = await supabase
         .from("order_assignments")
-        .select("*, orders(cliente_nome, luogo_evento, data_inizio, data_fine, descrizione_evento), vans(nome, targa)")
+        .select("*, orders(cliente_nome, luogo_evento, data_inizio, data_fine, descrizione_evento, note), vans(nome, targa)")
         .eq("employee_id", emp.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      const orderIds = [...new Set((assignments ?? []).map((a) => a.order_id))];
+      const { data: items, error: itemsError } = orderIds.length
+        ? await supabase
+            .from("order_items")
+            .select("order_id, equipment(nome, marca, modello, equipment_categories(nome))")
+            .in("order_id", orderIds)
+        : { data: [], error: null };
+      if (itemsError) throw itemsError;
+      return (assignments ?? []).map((assignment) => ({
+        ...assignment,
+        materiale: (items ?? []).filter((item) => item.order_id === assignment.order_id),
+      }));
     },
   });
 
@@ -69,7 +80,35 @@ function MieiLavori() {
               {a.orders && <p><CalendarDays className="mr-1.5 inline h-3.5 w-3.5" />{fmtDate(a.orders.data_inizio)} → {fmtDate(a.orders.data_fine)}</p>}
               <p><Truck className="mr-1.5 inline h-3.5 w-3.5" />{a.vans ? `${a.vans.nome}${a.vans.targa ? ` (${a.vans.targa})` : ""}` : "Nessun furgone"}</p>
             </div>
-            {a.orders?.descrizione_evento && <p className="mt-3 whitespace-pre-line rounded-md bg-muted/40 p-2 text-sm">{a.orders.descrizione_evento}</p>}
+            <div className="mt-4 space-y-3 border-t pt-3">
+              <section>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground"><FileText className="h-3.5 w-3.5" />Descrizione evento</p>
+                <p className="whitespace-pre-line text-sm">{a.orders?.descrizione_evento || "Nessuna descrizione inserita."}</p>
+              </section>
+              {a.orders?.note && (
+                <section>
+                  <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground"><StickyNote className="h-3.5 w-3.5" />Note operative</p>
+                  <p className="whitespace-pre-line text-sm">{a.orders.note}</p>
+                </section>
+              )}
+              <section>
+                <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-muted-foreground"><Package className="h-3.5 w-3.5" />Materiale da utilizzare · {a.materiale.length}</p>
+                {a.materiale.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nessun materiale associato.</p>
+                ) : (
+                  <ul className="divide-y rounded-md border bg-muted/20 px-3">
+                    {a.materiale.map((item) => (
+                      <li key={item.equipment?.nome} className="flex items-start justify-between gap-3 py-2 text-sm">
+                        <span className="font-medium">{item.equipment?.nome ?? "Attrezzatura"}</span>
+                        <span className="text-right text-xs text-muted-foreground">
+                          {[item.equipment?.marca, item.equipment?.modello].filter(Boolean).join(" ")}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            </div>
             <p className="mt-3 font-display text-lg text-primary">{eur(Number(a.compenso))}</p>
             {a.stato === "in_attesa" && (rejecting === a.id ? (
               <div className="mt-3 space-y-2">
